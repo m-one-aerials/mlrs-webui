@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#1a1a2e"/>
+  <rect x="32" y="32" width="448" height="448" rx="48" fill="#16213e" stroke="#e94560" stroke-width="4"/>
+  <text x="256" y="240" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="120" fill="#e94560">mLRS</text>
+  <text x="256" y="340" text-anchor="middle" font-family="sans-serif" font-weight="400" font-size="48" fill="#888">Config</text>
+</svg>

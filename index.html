@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mLRS Web UI</title>
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1><span>mLRS</span> Configuration</h1>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="panel">
+        <div class="panel-title">Connection</div>
+        <form id="connect-form">
+            <div class="connection-row">
+                <div class="field">
+                    <label for="serial-baudrate">Baudrate</label>
+                    <select id="serial-baudrate">
+                        <option value="9600">9600</option>
+                        <option value="19200">19200</option>
+                        <option value="38400">38400</option>
+                        <option value="57600">57600</option>
+                        <option value="115200" selected>115200</option>
+                        <option value="230400">230400</option>
+                    </select>
+                </div>
+                <button type="submit">Connect</button>
+                <button type="button" id="btn-disconnect" class="secondary hidden">Disconnect</button>
+                <span id="connection-indicator" class="indicator disconnected">Disconnected</span>
+            </div>
+            <div id="webserial-unsupported" class="hidden" style="color: var(--warning); font-size: 0.85rem; margin-top: 8px;">
+                Web Serial API is not supported in this browser. Please use Chrome or Edge.
+            </div>
+        </form>
+    </div>
+
+    <div id="device-panel" class="panel hidden">
+        <div class="panel-title">Device Info</div>
+        <div id="device-info" class="device-info-bar"></div>
+    </div>
+
+    <div id="actions-panel" class="panel hidden">
+        <div class="panel-title">Actions</div>
+        <div class="actions-row">
+            <button id="btn-store">Store</button>
+            <button id="btn-reload" class="secondary">Reload</button>
+            <div class="separator"></div>
+            <button id="btn-bind" class="secondary">Bind</button>
+            <div class="separator"></div>
+            <div class="config-id-group">
+                <span>Config ID: <strong id="config-id-display">-</strong></span>
+                <select id="config-id-select">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                </select>
+                <button id="btn-config-id" class="secondary">Set</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="params-panel" class="panel hidden">
+        <div class="panel-title">Parameters</div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="common">Common</button>
+            <button class="tab-btn" data-tab="tx">TX</button>
+            <button class="tab-btn" data-tab="rx">RX</button>
+            <button class="tab-btn" data-tab="failsafe">Failsafe</button>
+        </div>
+
+        <div id="tab-common" class="tab-content active">
+            <div id="params-common"></div>
+        </div>
+        <div id="tab-tx" class="tab-content">
+            <div id="params-tx"></div>
+        </div>
+        <div id="tab-rx" class="tab-content">
+            <div id="params-rx"></div>
+        </div>
+        <div id="tab-failsafe" class="tab-content">
+            <div id="params-failsafe"></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div id="stats-header" class="collapsible-header collapsed">
+            <span class="panel-title" style="margin-bottom:0">Statistics</span>
+        </div>
+        <div id="stats-body" class="hidden">
+
+            <div id="stats-dashboard" class="stats-dashboard">
+                <div class="stats-group">
+                    <div class="stats-group-title">Link Quality</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">TX Serial LQ</div>
+                            <div class="stat-value" id="stat-lq-serial">--<span class="stat-unit">%</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">TX Valid Frames</div>
+                            <div class="stat-value" id="stat-lq-frames">--<span class="stat-unit">%</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">RX Serial LQ</div>
+                            <div class="stat-value" id="stat-lq-rx">--<span class="stat-unit">%</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-group">
+                    <div class="stats-group-title">RSSI</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">TX Ant 1</div>
+                            <div class="stat-value" id="stat-rssi1">--<span class="stat-unit">dBm</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">TX Ant 2</div>
+                            <div class="stat-value" id="stat-rssi2">--<span class="stat-unit">dBm</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">RX</div>
+                            <div class="stat-value" id="stat-rssi-rx">--<span class="stat-unit">dBm</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-group">
+                    <div class="stats-group-title">SNR</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">TX Ant 1</div>
+                            <div class="stat-value" id="stat-snr1">--<span class="stat-unit">dB</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">TX Ant 2</div>
+                            <div class="stat-value" id="stat-snr2">--<span class="stat-unit">dB</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-group">
+                    <div class="stats-group-title">Throughput</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">TX Bytes/s</div>
+                            <div class="stat-value" id="stat-bytes-tx">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">RX Bytes/s</div>
+                            <div class="stat-value" id="stat-bytes-rx">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <details class="stats-raw-details">
+                <summary>Raw output</summary>
+                <pre id="stats-output" class="stats-output"></pre>
+            </details>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="collapsible-header collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');">
+            <span class="panel-title" style="margin-bottom:0">Advanced</span>
+        </div>
+        <div class="hidden">
+            <div class="advanced-section">
+                <div class="advanced-section-title">ESP WiFi Bridge</div>
+                <div class="advanced-row">
+                    <label>WiFi Password</label>
+                    <div class="advanced-input-group">
+                        <input type="text" id="esp-password" placeholder="8-24 characters" maxlength="24">
+                        <button type="button" id="btn-esp-get-pswd" class="secondary">Get</button>
+                        <button type="button" id="btn-esp-set-pswd" class="secondary">Set</button>
+                    </div>
+                </div>
+                <div class="advanced-row">
+                    <label>Network SSID</label>
+                    <div class="advanced-input-group">
+                        <input type="text" id="esp-netssid" placeholder="8-24 characters" maxlength="24">
+                        <button type="button" id="btn-esp-get-ssid" class="secondary">Get</button>
+                        <button type="button" id="btn-esp-set-ssid" class="secondary">Set</button>
+                    </div>
+                </div>
+                <div class="advanced-row">
+                    <label>Passthrough</label>
+                    <div class="advanced-input-group">
+                        <button type="button" id="btn-esp-passthrough" class="secondary btn-danger-outline">ESP Passthrough</button>
+                        <button type="button" id="btn-esp-boot" class="secondary btn-danger-outline">ESP Boot (Flash)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-section">
+                <div class="advanced-section-title">HC04 Bluetooth Module</div>
+                <div class="advanced-row">
+                    <label>Pin</label>
+                    <div class="advanced-input-group">
+                        <input type="number" id="hc04-pin" placeholder="1000-9999" min="1000" max="9999">
+                        <button type="button" id="btn-hc04-get-pin" class="secondary">Get</button>
+                        <button type="button" id="btn-hc04-set-pin" class="secondary">Set</button>
+                    </div>
+                </div>
+                <div class="advanced-row">
+                    <label>Passthrough</label>
+                    <div class="advanced-input-group">
+                        <button type="button" id="btn-hc04-passthrough" class="secondary btn-danger-outline">HC04 Passthrough</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-section">
+                <div class="advanced-section-title">System</div>
+                <div class="advanced-row">
+                    <label>Bootloader</label>
+                    <div class="advanced-input-group">
+                        <button type="button" id="btn-systemboot" class="secondary btn-danger-outline">System Boot</button>
+                        <span class="advanced-hint">Enters system bootloader (non-ESP only)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="collapsible-header collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');">
+            <span class="panel-title" style="margin-bottom:0">Raw Terminal</span>
+        </div>
+        <div class="hidden raw-terminal">
+            <pre id="raw-output" class="raw-output"></pre>
+            <form id="raw-form" class="raw-input-row">
+                <input type="text" id="raw-input" placeholder="Enter CLI command..." autocomplete="off">
+                <button type="submit">Send</button>
+                <button type="button" id="btn-raw-clear" class="secondary">Clear</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div id="toast-container"></div>
+
+<script src="js/qwebchannel.js"></script>
+<script src="js/serial.js?v=3"></script>
+<script src="js/parser.js?v=3"></script>
+<script src="js/api.js?v=3"></script>
+<script src="js/ui.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
+<script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+        navigator.serviceWorker.register('sw.js');
+    }
+</script>
+
+</body>
+</html>
